@@ -2,6 +2,7 @@ package com.cw;
 
 import com.cw.threads.ThreadFactory;
 import com.cw.utils.Config;
+import com.cw.utils.Utils;
 
 import java.awt.*;
 import java.io.*;
@@ -12,9 +13,12 @@ public class Main {
         System.out.println("|| Starting DMO - Migrator ||");
 
         Config config = new Config();
-        ThreadFactory threadFactory = new ThreadFactory();
-        threadFactory.initWatchThread(config);
-        threadFactory.initSbThread(config);
+
+        if (Utils.checkRequirements(config)) {
+            ThreadFactory threadFactory = new ThreadFactory();
+            threadFactory.initWatchThread(config);
+            threadFactory.initSbThread(config);
+        }
     }
 
 }

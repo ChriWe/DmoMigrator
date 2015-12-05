@@ -36,7 +36,6 @@ public class Watcher {
 
 
         this.dmoThread = threadFactory.initDmoThread(this.dmoList.get(0));
-//        cleanupTrj();
     }
 
     public void watch() {
@@ -60,7 +59,7 @@ public class Watcher {
                 WatchEvent<Path> ev = (WatchEvent<Path>) event;
                 Path fileName = ev.context();
 
-                System.out.println(kind.name() + ": " + fileName);
+//                System.out.println(kind.name() + ": " + fileName);
 
                 if (kind == OVERFLOW) {
                     continue;
@@ -70,9 +69,8 @@ public class Watcher {
 
                 } else if (kind == ENTRY_MODIFY) {
 
-                    // just modify trajectories
                     if (fileName.toString().equals(TRJ_NAME)) {
-                        // just start new Thread if a trajectorie is ready
+
                         if (dmoCount < dmoList.size()) {
                             String dmoName = dmoList.get(dmoCount);
                             String csvName = dmoName + ".csv";
@@ -84,10 +82,8 @@ public class Watcher {
                                 this.dmoThread = threadFactory.initDmoThread(nextDmo);
                             }
 
-
                             dmoCount++;
                         }
-
 
                         if (dmoCount == dmoList.size()) {
                             System.out.println("-- Done converting all dmo´s. Exiting DMO - Migrator");
@@ -101,16 +97,6 @@ public class Watcher {
             boolean valid = key.reset();
             if (!valid) {
                 break;
-            }
-        }
-    }
-
-    private void cleanupTrj() {
-        File[] trjFiles = trjDir.listFiles();
-        for (File trjFile : trjFiles) {
-            if (trjFile.getName().equals(TRJ_NAME)) {
-                trjFile.delete();
-                System.out.println("-- Cleaned trajectories.csv");
             }
         }
     }
