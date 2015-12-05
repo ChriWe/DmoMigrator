@@ -34,8 +34,9 @@ public class Watcher {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.key = trjDir.toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
-//        cleanupTrj();
+
         this.dmoThread = threadFactory.initDmoThread(this.dmoList.get(0));
+//        cleanupTrj();
     }
 
     public void watch() {
@@ -69,25 +70,30 @@ public class Watcher {
 
                 } else if (kind == ENTRY_MODIFY) {
 
-                    if (dmoCount < dmoList.size()) {
-                        Thread.currentThread().isInterrupted();
-                        String dmoName = dmoList.get(dmoCount);
-                        String csvName = dmoName + ".csv";
-                        renameTrj(fileName.toString(), csvName);
-                        System.out.println("-- " + (dmoCount + 1) + ". Creation: " + csvName);
+                    // just modify trajectories
+                    if (fileName.toString().equals(TRJ_NAME)) {
+                        // just start new Thread if a trajectorie is ready
+                        if (dmoCount < dmoList.size()) {
+                            String dmoName = dmoList.get(dmoCount);
+                            String csvName = dmoName + ".csv";
+                            renameTrj(fileName.toString(), csvName);
+                            System.out.println("-- " + (dmoCount + 1) + ". Creation: " + csvName);
 
-                        if (dmoCount < dmoList.size() - 1) {
-                            String nextDmo = dmoList.get(dmoCount + 1);
-                            this.dmoThread = threadFactory.initDmoThread(nextDmo);
+                            if (dmoCount < dmoList.size() - 1) {
+                                String nextDmo = dmoList.get(dmoCount + 1);
+                                this.dmoThread = threadFactory.initDmoThread(nextDmo);
+                            }
+
+
+                            dmoCount++;
+                        }
+
+
+                        if (dmoCount == dmoList.size()) {
+                            System.out.println("-- Done converting all dmo´s. Exiting DMO - Migrator");
+                            System.exit(0);
                         }
                     }
-
-                    dmoCount++;
-                    if (dmoCount == dmoList.size()) {
-                        System.out.println("|| Done converting all dmo´s. Exiting DMO - Migrator");
-                        System.exit(0);
-                    }
-
                 }
             }
 
@@ -104,25 +110,20 @@ public class Watcher {
         for (File trjFile : trjFiles) {
             if (trjFile.getName().equals(TRJ_NAME)) {
                 trjFile.delete();
-                System.out.println("-- Cleanup done");
+                System.out.println("-- Cleaned trajectories.csv");
             }
         }
-    }
-
-    private boolean trjExists() {
-        File[] trjFiles = trjDir.listFiles();
-        for (File trjFile : trjFiles) {
-            if (trjFile.getName().equals(TRJ_NAME)) {
-                System.out.println("-- Trajectories file already exists");
-                return true;
-            }
-        }
-        return false;
     }
 
     private void renameTrj(String fileName, String newName) {
         File trjFile = new File(trjDir.toString() + "/" + fileName);
         File newFile = new File(trjDir.toString() + "/" + newName);
+
+        if (newFile.exists()) {
+            System.out.println("-- Overriding file " + newName);
+            newFile.delete();
+        }
+
         trjFile.renameTo(newFile);
     }
 

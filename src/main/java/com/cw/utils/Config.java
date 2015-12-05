@@ -17,7 +17,7 @@ public class Config {
         HashMap<String, String> config = getConfig();
         this.OS = config.get("OS");
         this.SB_Home = config.get("SB_HOME");
-        System.out.println("-- Loading config:\n- OS: " + this.OS + "\n- SB_HOME" + this.SB_Home);
+        System.out.println("-- Loading config:\n--- OS: " + this.OS + "\n--- SB_HOME: " + this.SB_Home);
     }
 
     public static HashMap getConfig() {

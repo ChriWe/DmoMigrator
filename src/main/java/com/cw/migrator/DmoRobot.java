@@ -26,7 +26,7 @@ public class DmoRobot {
         type(initial);
         type(dmo);
         type(KeyEvent.VK_ENTER);
-        System.out.println("-- Initialize dmo " + dmo);
+        System.out.println("-- Initialize " + dmo + ".dmo");
 
         robot.delay(10000);
         type("t/gamespeed 1000");

@@ -37,6 +37,7 @@ public class ThreadFactory {
         Thread watchThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Thread.currentThread().setName("watch");
                 Watcher watcher = null;
                 try {
                     watcher = new Watcher(config);
@@ -54,6 +55,7 @@ public class ThreadFactory {
         Thread dmoThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Thread.currentThread().setName("dmo");
                 try {
                     DmoRobot dmoRobot = new DmoRobot();
                     dmoRobot.executeRobot(dmo);
@@ -70,6 +72,7 @@ public class ThreadFactory {
         Thread sbThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Thread.currentThread().setName("sb");
                 Process sb = runSb(config.getSbHome());
             }
         });
