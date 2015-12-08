@@ -10,11 +10,16 @@ import java.util.ArrayList;
  */
 public class Utils {
 
-    public static ArrayList getDmoFiles(String sbPath) {
-        String dmoPath = sbPath + "/dmo";
-        File dmoDir = new File(dmoPath);
+    private static OSConfig OSConfig;
+
+    static {
+        OSConfig = new OSConfig();
+    }
+
+    public static ArrayList getDmoFiles() {
+        File[] dmoFiles = OSConfig.getDmoFile().listFiles();
         ArrayList<String> dmoList = new ArrayList<>();
-        for (File dmo : dmoDir.listFiles()) {
+        for (File dmo : dmoFiles) {
             if (FilenameUtils.isExtension(dmo.getName(), "dmo")) {
                 dmoList.add(FilenameUtils.getBaseName(dmo.getName()));
             }
@@ -22,21 +27,31 @@ public class Utils {
         return dmoList;
     }
 
-    public static boolean checkRequirements(Config config) {
-        File trjDir = new File(config.getSbHome() + "/trajectories");
-
-        return trjCleaned(trjDir);
+    public static boolean checkRequirements() {
+        return trjCleaned();
     }
 
-    private static boolean trjCleaned(File trjDir) {
-        File[] trjFiles = trjDir.listFiles();
+    private static boolean trjCleaned() {
+        File[] trjFiles = OSConfig.getTrjFile().listFiles();
         for (File trjFile : trjFiles) {
-            if (trjFile.getName().equals("trajectorie.csv")) {
-                System.out.println("-- Remove trajectorie.csv");
+            if (trjFile.getName().equals(OSConfig.getTrjName())) {
+                System.out.println("-- Remove " + OSConfig.getTrjName());
                 return trjFile.delete();
             }
         }
         return true;
+    }
+
+    public static boolean renameTrj(String fileName, String newName) {
+        File trjFile = new File(OSConfig.getTrjHome() + "/" + fileName);
+        File newFile = new File(OSConfig.getTrjHome() + "/" + newName);
+
+        if (newFile.exists()) {
+            System.out.println("-- Overriding file " + newName);
+            newFile.delete();
+        }
+
+        return trjFile.renameTo(newFile);
     }
 
 }

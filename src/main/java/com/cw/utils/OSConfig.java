@@ -1,5 +1,6 @@
 package com.cw.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -8,20 +9,20 @@ import java.util.Properties;
 /**
  * Created by Christoph on 02.12.2015.
  */
-public class Config {
+public class OSConfig {
 
     private String OS;
-    private String SB_Home;
+    private String SB_HOME;
+    private String TRJ_DEFAULT_NAME = "trajectorie.csv";
 
-    public Config() {
-        HashMap<String, String> config = getConfig();
-        this.OS = config.get("OS");
-        this.SB_Home = config.get("SB_HOME");
-        System.out.println("-- Loading config:\n--- OS: " + this.OS + "\n--- SB_HOME: " + this.SB_Home);
+    public OSConfig() {
+        Properties config = getConfig();
+        this.OS = config.getProperty("OS");
+        this.SB_HOME = config.getProperty("SB_HOME");
+        System.out.println("-- Loading config:\n--- OS: " + this.OS + "\n--- SB_HOME: " + this.SB_HOME);
     }
 
-    public static HashMap getConfig() {
-        HashMap<String, String> config = new HashMap<>();
+    public static Properties getConfig() {
         Properties prop = new Properties();
         InputStream input = null;
 
@@ -29,8 +30,6 @@ public class Config {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
             input = classloader.getResourceAsStream("os.properties");
             prop.load(input);
-            config.put("OS", prop.getProperty("OS"));
-            config.put("SB_HOME", prop.getProperty("SB_HOME"));
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -43,7 +42,7 @@ public class Config {
             }
         }
 
-        return config;
+        return prop;
     }
 
 
@@ -52,7 +51,26 @@ public class Config {
     }
 
     public String getSbHome() {
-        return SB_Home;
+        return SB_HOME;
     }
 
+    public String getTrjHome() {
+        return SB_HOME + "/trajectories";
+    }
+
+    public File getTrjFile() {
+        return new File(SB_HOME + "/trajectories");
+    }
+
+    public String getDmoHome() {
+        return SB_HOME + "/dmo";
+    }
+
+    public File getDmoFile() {
+        return new File(SB_HOME + "/dmo");
+    }
+
+    public String getTrjName() {
+        return TRJ_DEFAULT_NAME;
+    }
 }

@@ -2,7 +2,7 @@ package com.cw.threads;
 
 import com.cw.migrator.DmoRobot;
 import com.cw.migrator.Watcher;
-import com.cw.utils.Config;
+import com.cw.utils.OSConfig;
 
 import java.awt.*;
 import java.io.File;
@@ -14,16 +14,16 @@ import java.util.*;
  */
 public class ThreadFactory {
 
-    private Config config;
+    private OSConfig OSConfig;
 
-    public Thread initWatchThread(Config config) {
-        this.config = config;
+    public Thread initWatchThread(OSConfig OSConfig) {
+        this.OSConfig = OSConfig;
         watchThread().start();
 
         return null;
     }
-    public Thread initSbThread(Config config) {
-        this.config = config;
+    public Thread initSbThread(OSConfig OSConfig) {
+        this.OSConfig = OSConfig;
         sbThread().start();
 
         return null;
@@ -40,7 +40,7 @@ public class ThreadFactory {
                 Thread.currentThread().setName("watch");
                 Watcher watcher = null;
                 try {
-                    watcher = new Watcher(config);
+                    watcher = new Watcher(OSConfig);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -73,7 +73,7 @@ public class ThreadFactory {
             @Override
             public void run() {
                 Thread.currentThread().setName("sb");
-                Process sb = runSb(config.getSbHome());
+                Process sb = runSb(OSConfig.getSbHome());
             }
         });
 
@@ -84,10 +84,10 @@ public class ThreadFactory {
         File sbDir = new File(sbPath);
         java.util.List<String> exec = null;
 
-        if (config.getOS().equals("WIN64")) {
+        if (OSConfig.getOS().equals("WIN64")) {
             exec = Arrays.asList("\"" + sbPath + "/bin64/sauerbraten.exe\"", "-t0", "-w640", "-h480", "-qhome");
-        } else if (config.getOS().equals("LINUX")) {
-            exec = Arrays.asList("/bin/sh","/home/juergen/Downloads/sauerbraten/sauerbraten_unix");
+        } else if (OSConfig.getOS().equals("LINUX")) {
+            exec = Arrays.asList("/bin/sh", "/home/juergen/Downloads/sauerbraten/sauerbraten_unix");
         }
 
         ProcessBuilder pb = new ProcessBuilder(exec);

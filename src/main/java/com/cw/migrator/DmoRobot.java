@@ -2,7 +2,6 @@ package com.cw.migrator;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 
 /**
  * Created by Christoph on 17.11.2015.
@@ -43,17 +42,19 @@ public class DmoRobot {
     private void type(String s) {
         byte[] bytes = s.getBytes();
         for (byte b : bytes) {
+            // Handle /
             if (b == 47) {
                 robot.keyPress(KeyEvent.VK_SHIFT);
                 robot.keyPress(KeyEvent.VK_7);
                 robot.keyRelease(KeyEvent.VK_7);
                 robot.keyRelease(KeyEvent.VK_SHIFT);
+            // Handle _
             } else if (b == 95) {
                 robot.keyPress(KeyEvent.VK_SHIFT);
                 robot.keyPress(KeyEvent.VK_MINUS);
                 robot.keyRelease(KeyEvent.VK_MINUS);
                 robot.keyRelease(KeyEvent.VK_SHIFT);
-            }   else {
+            }  else {
                 int code = b;
                 // keycode only handles [A-Z] (which is ASCII decimal [65-90])
                 if (code > 96 && code < 123) {
