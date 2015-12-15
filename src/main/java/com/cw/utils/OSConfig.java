@@ -3,7 +3,6 @@ package com.cw.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -13,13 +12,16 @@ public class OSConfig {
 
     private String OS;
     private String SB_HOME;
+    private String TRJ_HOME;
+    private String DMO_HOME;
     private String TRJ_DEFAULT_NAME = "trajectorie.csv";
 
     public OSConfig() {
         Properties config = getConfig();
         this.OS = config.getProperty("OS");
         this.SB_HOME = config.getProperty("SB_HOME");
-        System.out.println("-- Loading config:\n--- OS: " + this.OS + "\n--- SB_HOME: " + this.SB_HOME);
+        this.TRJ_HOME = config.getProperty("TRJ_HOME");
+        this.DMO_HOME = config.getProperty("DMO_HOME");
     }
 
     public static Properties getConfig() {
@@ -46,31 +48,38 @@ public class OSConfig {
     }
 
 
-    public String getOS() {
+    public String getOs() {
         return OS;
     }
 
-    public String getSbHome() {
+    public String getSbDirPath() {
         return SB_HOME;
     }
 
-    public String getTrjHome() {
-        return SB_HOME + "/trajectories";
+    public String getTrjHomePath() {
+        return TRJ_HOME;
     }
 
-    public File getTrjFile() {
-        return new File(SB_HOME + "/trajectories");
+    public File getTrjDir() {
+        return new File(TRJ_HOME);
     }
 
-    public String getDmoHome() {
-        return SB_HOME + "/dmo";
+    public String getDmoDirPath() {
+        return DMO_HOME;
     }
 
-    public File getDmoFile() {
-        return new File(SB_HOME + "/dmo");
+    public File getDmoDir() {
+        return new File(DMO_HOME);
     }
 
-    public String getTrjName() {
+    public String getTrjDefaultName() {
         return TRJ_DEFAULT_NAME;
+    }
+
+    public void printConfig() {
+        System.out.println("-- Loading config:\n--- OS: " + this.OS
+                + "\n--- SB_HOME: " + this.SB_HOME
+                + "\n--- TRJ_HOME: " + this.TRJ_HOME
+                + "\n--- DMO_HOME: " + this.DMO_HOME);
     }
 }

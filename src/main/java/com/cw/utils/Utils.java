@@ -17,7 +17,7 @@ public class Utils {
     }
 
     public static ArrayList getDmoFiles() {
-        File[] dmoFiles = OSConfig.getDmoFile().listFiles();
+        File[] dmoFiles = OSConfig.getDmoDir().listFiles();
         ArrayList<String> dmoList = new ArrayList<>();
         for (File dmo : dmoFiles) {
             if (FilenameUtils.isExtension(dmo.getName(), "dmo")) {
@@ -32,10 +32,10 @@ public class Utils {
     }
 
     private static boolean trjCleaned() {
-        File[] trjFiles = OSConfig.getTrjFile().listFiles();
+        File[] trjFiles = OSConfig.getTrjDir().listFiles();
         for (File trjFile : trjFiles) {
-            if (trjFile.getName().equals(OSConfig.getTrjName())) {
-                System.out.println("-- Remove " + OSConfig.getTrjName());
+            if (trjFile.getName().equals(OSConfig.getTrjDefaultName())) {
+                System.out.println("-- Remove " + OSConfig.getTrjDefaultName());
                 return trjFile.delete();
             }
         }
@@ -43,8 +43,8 @@ public class Utils {
     }
 
     public static boolean renameTrj(String fileName, String newName) {
-        File trjFile = new File(OSConfig.getTrjHome() + "/" + fileName);
-        File newFile = new File(OSConfig.getTrjHome() + "/" + newName);
+        File trjFile = new File(OSConfig.getTrjHomePath() + "/" + fileName);
+        File newFile = new File(OSConfig.getTrjHomePath() + "/" + newName);
 
         if (newFile.exists()) {
             System.out.println("-- Overriding file " + newName);

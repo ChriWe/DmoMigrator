@@ -73,7 +73,7 @@ public class ThreadFactory {
             @Override
             public void run() {
                 Thread.currentThread().setName("sb");
-                Process sb = runSb(OSConfig.getSbHome());
+                Process sb = runSb(OSConfig.getSbDirPath());
             }
         });
 
@@ -84,9 +84,9 @@ public class ThreadFactory {
         File sbDir = new File(sbPath);
         java.util.List<String> exec = null;
 
-        if (OSConfig.getOS().equals("WIN64")) {
+        if (OSConfig.getOs().equals("WIN64")) {
             exec = Arrays.asList("\"" + sbPath + "/bin64/sauerbraten.exe\"", "-t0", "-w640", "-h480", "-qhome");
-        } else if (OSConfig.getOS().equals("LINUX")) {
+        } else if (OSConfig.getOs().equals("LINUX")) {
             exec = Arrays.asList("/bin/sh", "/home/juergen/Downloads/sauerbraten/sauerbraten_unix");
         }
 

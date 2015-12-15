@@ -30,7 +30,7 @@ public class Watcher {
         this.dmoList = Utils.getDmoFiles();
         this.threadFactory = new ThreadFactory();
         this.watcher = FileSystems.getDefault().newWatchService();
-        this.key = osConfig.getTrjFile().toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+        this.key = osConfig.getTrjDir().toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
         this.dmoThread = threadFactory.initDmoThread(this.dmoList.get(0));
     }
@@ -63,7 +63,7 @@ public class Watcher {
 
                 } else if (kind == ENTRY_MODIFY) {
 
-                    if (fileName.toString().equals(osConfig.getTrjName())) {
+                    if (fileName.toString().equals(osConfig.getTrjDefaultName())) {
 
                         if (dmoCount < dmoList.size()) {
                             String dmoName = dmoList.get(dmoCount);
@@ -102,7 +102,7 @@ public class Watcher {
         PostGISJDBC postGISJDBC = new PostGISJDBC(jdbcConfig);
         postGISJDBC.init();
 
-        File[] trjHome = new File(osConfig.getTrjHome()).listFiles();
+        File[] trjHome = new File(osConfig.getTrjHomePath()).listFiles();
         for (File trjFile: trjHome) {
             TrjParser trjParser = new TrjParser(trjFile);
             trjParser.writeTrjToPostGIS(jdbcConfig, postGISJDBC);
