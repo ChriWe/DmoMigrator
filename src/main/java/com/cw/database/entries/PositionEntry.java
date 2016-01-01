@@ -17,7 +17,7 @@ public class PositionEntry {
 
     private String schema;
     private UUID uuid;
-    private int player_id;
+    private UUID player_id;
     private int ingame_id;
     private Point coord;
     private double yaw;
@@ -33,7 +33,7 @@ public class PositionEntry {
     private int player_run;
     private UUID game_id;
 
-    public PositionEntry(String schema, UUID uuid, int player_id, int ingame_id, Point coord, double yaw, double pitch, double roll, double dpos, double dyaw, double dpitch, double droll, int game_lfd, int network_time, String message, int player_run, UUID game_id) {
+    public PositionEntry(String schema, UUID uuid, UUID player_id, int ingame_id, Point coord, double yaw, double pitch, double roll, double dpos, double dyaw, double dpitch, double droll, int game_lfd, int network_time, String message, int player_run, UUID game_id) {
         this.schema = schema;
         this.uuid = uuid;
         this.game_id = game_id;

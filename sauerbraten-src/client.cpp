@@ -2,7 +2,7 @@
 
 namespace server
 {
-  extern stream *juergen; // something that represents the comma separated file
+  extern stream *outputfile; // something that represents the comma separated file
 }
 namespace game
 {
@@ -12,27 +12,37 @@ namespace game
     FVARP(minimapalpha, 0, 1, 1);
     int timecounter=0;
 
-    void writeToFile(fpsent *d, char *msg) //function that is called by other functions to write to the comma separated file
-    {	using server::juergen;
+    void writeToFile(fpsent *d, char *callingmethod) //function that is called by other functions to write to the comma separated file
+    {	using server::outputfile;
 
-		if(d==NULL){
-			if(juergen && msg){juergen->printf("%s\n",msg);
-			}
-			else{
-				if(juergen)juergen->printf("nothing present\n");
-			}
-		}else{
+        if(outputfile){
+            if (timecounter==0) {
+                outputfile->printf("clientnum, x, y, z, yaw, pitch, roll, dpos, dyaw, dpitch, droll, timecounter, lastupdate, callingmethod\n");
+              //  outputfile->printf("name, health, ammo, armour, amourtype, deaths, flags, gunselect, info, maxhealth, skill, team, totaldemage, totalshots, ");
+              //  outputfile->printf("type, weight, aboveeye, aitype, attackchan, attacking, attacksound, blocked, collidetype, editsate, eyeheight, falling, feetpos, flagpickup, floor, ");
+              //  outputfile->printf("frags, lastaction, lastattackgun, lastbase, gunwait, idlechan, idlesound, inwater, jumping, k_down, k_left, k_right, k_up, lastcollect, ");
+              //  outputfile->printf("lastnode, lastpain, lastpickup, lastpickupmillis, lastrendered, lastrepammo, lasttaunt, lastupdate, lifesequence, maxspeed, move, muzzle, newpitch, newpos, ");
+              //  outputfile->printf("newroll, newyaw, occluded, ownernum, physstate, ping, plag, playermodel, privilege, quadmillis, radius, respawned, smoothmillis, state, ");
+              //  outputfile->printf("strafe, suicided, timeinair, tokens, vel, xradius, yradius, zmargin\n");
+            }
 
-			if(juergen && msg && d->o.x && d->o.y && d->o.z){
-                if (timecounter==0) {
-                    juergen->printf("clientnum, x, y, z, yaw, pitch, roll, dpos, dyaw, dpitch, droll, timecounter, lastupdate, msg \n");
-                }
-				juergen->printf("%i, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %i, %i, %s\n",
-                    d->clientnum, d->o.x, d->o.y, d->o.z, d->yaw, d->pitch, d->roll, d->deltapos, d->deltayaw, d->deltapitch, d->deltaroll,
-                    timecounter,d->lastupdate,msg);
-				timecounter++;
-			}
-		}
+            if (d) {
+              outputfile->printf("%i, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %i, %i, %s\n", d->clientnum, d->o.x, d->o.y, d->o.z, d->yaw, d->pitch, d->roll, d->deltapos, d->deltayaw, d->deltapitch, d->deltaroll, timecounter, d->lastupdate, callingmethod);
+              //  outputfile->printf("%s, %i, %i, %i, %i, %i, %i, %i, %s, %i, %i, %s, %i, %i ", d->name, d->health, d->ammo, d->armour, d->armourtype, d->deaths, d->flags, d->gunselect, d->info, d->maxhealth, d->skill, d->team, d->totaldamage, d->totalshots);
+              //  outputfile->printf("%u, %i, %f, %i, %i, %d, %i, %d, %u, %u, %f, %f, %i, %f ", d->type, d->weight, d->aboveeye, d->aitype, d->attackchan, d->attacking, d->attacksound, d->blocked, d->collidetype, d->editstate, d->eyeheight, d->falling, d->flagpickup, d->floor);
+              //  outputfile->printf("%i, %i, %i, %i, %i, %i, %i, %i, %d, %d, %d, %d, %d, %f ", d->frags, d->lastaction, d->lastattackgun, d->lastbase, d->gunwait, d->idlechan, d->idlesound, d->inwater, d->jumping, d->k_down, d->k_left, d->k_right, d->k_up, d->lastcollect);
+              //  outputfile->printf("%i, %i, %i, %i, %i, %i, %i, %i, %i, %f, %c, %f, %f, %f ", d->lastnode, d->lastpain, d->lastpickup, d->lastpickupmillis, d->lastrendered, d->lastrepammo, d->lasttaunt, d->lastupdate, d->lifesequence, d->maxspeed, d->move, d->muzzle, d->newpitch, d->newpos);
+              //  outputfile->printf("%f, %f, %i, %i, %u, %i, %i, %i, %i, %i, %i, %i, %i, %u ", d->newroll, d->newyaw, d->occluded, d->ownernum, d->physstate, d->ping, d->plag, d->playermodel, d->privilege, d->quadmillis, d->radius, d->respawned, d->smoothmillis, d->state);
+              //  outputfile->printf("%c, %i, %i, %i, %f, %f, %f, %f\n", d->strafe, d->suicided, d->timeinair, d->tokens, d->vel, d->xradius, d->yradius, d->zmargin);
+
+            }
+            else {
+                outputfile->printf("%i, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %i, %i, %s\n", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, timecounter, 0, callingmethod);
+            }
+
+            timecounter++;
+        }
+
 	}
 
     float calcradarscale()
@@ -997,6 +1007,7 @@ namespace game
                 q.put((falldir>>8)&0xFF);
             }
         }
+
     }
 
     void sendposition(fpsent *d, bool reliable)
@@ -1104,7 +1115,7 @@ namespace game
 
     void updatepos(fpsent *d)
     {
-        using server::juergen;
+        using server::outputfile;
         // update the position of other clients in the game in our world
         // don't care if he's in the scenery or other players,
         // just don't overlap with our client
@@ -1120,10 +1131,6 @@ namespace game
             if(fx<fy) d->o.y += dy<0 ? r-fy : -(r-fy);  // push aside
             else      d->o.x += dx<0 ? r-fx : -(r-fx);
         }
-        //if(juergen) juergen->printf("%f,%f,%f\n",d->o.x,d->o.y,d->o.z);
-        char buffer [256];
-        sprintf(buffer," ");
-        writeToFile(d,buffer);
 
         int lagtime = totalmillis-d->lastupdate;
         if(lagtime)
@@ -1135,7 +1142,7 @@ namespace game
 
     void parsepositions(ucharbuf &p)
     {
-        using server::juergen;
+        using server::outputfile;
 
         int type;
         while(p.remaining()) switch(type = getint(p))
@@ -1209,7 +1216,11 @@ namespace game
                 }
                 else d->smoothmillis = 0;
                 if(d->state==CS_LAGGED || d->state==CS_SPAWNING) d->state = CS_ALIVE;
-
+                //###################################################################################################################################################
+                char buffer[256];
+                sprintf(buffer,"parseposition_n_pos");
+                writeToFile(d, buffer);
+                //###################################################################################################################################################
                 break;
             }
 
@@ -1219,6 +1230,12 @@ namespace game
                 fpsent *d = getclient(cn);
                 if(!d || d->lifesequence < 0 || d->state==CS_DEAD) continue;
                 entities::teleporteffects(d, tp, td, false);
+                //###################################################################################################################################################
+                char buffer[256];
+                sprintf(buffer,"parseposition_n_teleport");
+                writeToFile(d, buffer);
+                //###################################################################################################################################################
+
                 break;
             }
 
@@ -1228,13 +1245,20 @@ namespace game
                 fpsent *d = getclient(cn);
                 if(!d || d->lifesequence < 0 || d->state==CS_DEAD) continue;
                 entities::jumppadeffects(d, jp, false);
+                //###################################################################################################################################################
+                char buffer[256];
+                sprintf(buffer,"parseposition_n_jumppad");
+                writeToFile(d, buffer);
+                //###################################################################################################################################################
                 break;
             }
 
             default:
                 neterr("type");
                 return;
+
         }
+
     }
 
     void parsestate(fpsent *d, ucharbuf &p, bool resume = false)
@@ -1271,7 +1295,7 @@ namespace game
 
     void parsemessages(int cn, fpsent *d, ucharbuf &p)
     {
-        using server::juergen;
+        using server::outputfile;
         static char text[MAXTRANS];
         int type;
         bool mapchanged = false, demopacket = false;
@@ -1345,10 +1369,6 @@ namespace game
                 if(!d) return;
                 int sound;
                 playsound(sound = getint(p), &d->o);
-                //if(juergen) juergen->printf("%s played sound %i\n", d->name, sound);
-                //char buffer [256];
-                //sprintf(buffer,"%i played sound %i", d->clientnum, sound);
-                //writeToFile(d,buffer);
                 break;
             }
 
@@ -1383,10 +1403,11 @@ namespace game
                 mapchanged = true;
                 if(getint(p)) entities::spawnitems();
                 else senditemstoserver = false;
-                //if(juergen) juergen->printf("next mapname:%s\n", text);
-                //char buffer[256];
-                //sprintf(buffer,"next mapname: %s",text);
-                //writeToFile(d,buffer);
+                //###################################################################################################################################################
+                char buffer[256];
+                sprintf(buffer,"parsemessages_n_mapchange: %s", text);
+                writeToFile(NULL, buffer);
+                //###################################################################################################################################################
                 break;
 
             case N_FORCEDEATH:
@@ -1438,16 +1459,13 @@ namespace game
                 else                    // new client
                 {
                     conoutf("\f0join:\f7 %s", colorname(d, text));
-                    //if(juergen) juergen->printf("%i, joined with name :%s\n",d->clientnum,text);
-                    //char buffer[256];
-					//sprintf(buffer,"%i joined with name :%s\n",d->clientnum,text);
-                    //writeToFile(d,buffer);
                     if(needclipboard >= 0) needclipboard++;
                 }
                 copystring(d->name, text, MAXNAMELEN+1);
                 getstring(text, p);
                 filtertext(d->team, text, false, false, MAXTEAMLEN);
                 d->playermodel = getint(p);
+
                 break;
             }
 
@@ -1486,10 +1504,6 @@ namespace game
                 {
                     if(d->state==CS_DEAD && d->lastpain) saveragdoll(d);
                     d->respawn();
-                    //if(juergen) juergen->printf("%i,%f,%f,%f,spawned\n",d->clientnum,d->o.x,d->o.y,d->o.z);
-                    //char buffer[256];
-					//sprintf(buffer,"%i spawned with name:%s",d->clientnum,d->name);
-                    //writeToFile(d,buffer);
                 }
                 parsestate(d, p);
                 if(!d) break;
@@ -1566,18 +1580,7 @@ namespace game
                 target->health = health;
                 if(target->state == CS_ALIVE && actor != player1) target->lastpain = lastmillis;
                 damaged(damage, target, actor, false);
-                // if(juergen){
-					 // juergen->printf("%i,%f,%f,%f,%i hit points to: %i\n",actor->clientnum,actor->o.x,actor->o.y,actor->o.z,damage,target->clientnum);
-					 // juergen->printf("%i,%f,%f,%f,%i hit points from: %i\n",target->clientnum,target->o.x,target->o.y,target->o.z,damage,actor->clientnum);
-					 //juergen->printf("%i,,,, %i hit points to: %i\n",actor->clientnum,damage,target->clientnum);
-					//char buffer[256];
-					//sprintf(buffer,"%i hit points to: %i",damage,target->clientnum);
-					//writeToFile(actor,buffer);
-					// juergen->printf("%i,,,, %i hit points from: %i\n",target->clientnum,damage,actor->clientnum);
-					//char buffer1[256];
-					//sprintf(buffer1,"%i hit points from: %i",damage,actor->clientnum);
-					//writeToFile(target,buffer1);
-				//}
+
                 break;
             }
 
@@ -1605,17 +1608,15 @@ namespace game
                     particle_textcopy(actor->abovehead(), ds, PART_TEXT, 2000, 0x32FF64, 4.0f, -8);
                 }
                 if(!victim) break;
-                  //   if(juergen) {
-					//juergen->printf("%i,%f,%f,%f, killed: %i\n",actor->clientnum,actor->o.x,actor->o.y,actor->o.z,victim->clientnum);
-					//char buffer[256];
-					//sprintf(buffer,"%i killed: %i",actor->clientnum,victim->clientnum);
-                    //writeToFile(actor,buffer);
-					//juergen->printf("%i,%f,%f,%f, got killed from: %i\n",victim->clientnum,victim->o.x,victim->o.y,victim->o.z,actor->clientnum);
-					//char buffer1[256];
-					//sprintf(buffer1,"%i got killed from: %i",victim->clientnum,actor->clientnum);
-                    //writeToFile(victim,buffer1);
-				//}
+                //###################################################################################################################################################
+                char buffer[256];
+                sprintf(buffer,"parsemessages_n_died");
+                writeToFile(victim, buffer);
+                //###################################################################################################################################################
+
                 killed(victim, actor);
+
+
                 break;
             }
 

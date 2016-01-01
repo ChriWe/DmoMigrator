@@ -18,23 +18,23 @@ public class TrjData {
     private final String droll;
     private final String timecounter;
     private final String lastupdate;
-    private final String msg;
+    private final String callingMethod;
 
-    public TrjData(String clientnum, String x, String y, String z, String yaw, String pitch, String roll, String dpos, String dyaw, String dpitch, String droll, String timecounter, String lastupdate, String msg) {
-        this.clientnum = clientnum;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.roll = roll;
-        this.dpos = dpos;
-        this.dyaw = dyaw;
-        this.dpitch = dpitch;
-        this.droll = droll;
-        this.timecounter = timecounter;
-        this.lastupdate = lastupdate;
-        this.msg = msg;
+    public TrjData(String clientnum, String x, String y, String z, String yaw, String pitch, String roll, String dpos, String dyaw, String dpitch, String droll, String timecounter, String lastupdate, String callingMethod) {
+        this.clientnum = clientnum.trim();
+        this.x = x.trim();
+        this.y = y.trim();
+        this.z = z.trim();
+        this.yaw = yaw.trim();
+        this.pitch = pitch.trim();
+        this.roll = roll.trim();
+        this.dpos = dpos.trim();
+        this.dyaw = dyaw.trim();
+        this.dpitch = dpitch.trim();
+        this.droll = droll.trim();
+        this.timecounter = timecounter.trim();
+        this.lastupdate = lastupdate.trim();
+        this.callingMethod = callingMethod.trim();
     }
 
     public String getClientnum() {
@@ -89,7 +89,7 @@ public class TrjData {
         return lastupdate;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getCallingMethod() {
+        return callingMethod;
     }
 }

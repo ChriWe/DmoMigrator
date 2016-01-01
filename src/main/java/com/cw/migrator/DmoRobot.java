@@ -1,5 +1,7 @@
 package com.cw.migrator;
 
+import com.cw.utils.SbConfig;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -8,29 +10,37 @@ import java.awt.event.KeyEvent;
  */
 public class DmoRobot {
 
-    private Robot robot;
+    private final SbConfig sbConfig;
+    private final Robot robot;
 
-    public DmoRobot() throws AWTException {
-        robot = new Robot();
+    private DmoRobot(SbConfig sbConfig) throws AWTException {
+        this.sbConfig = sbConfig;
+        this.robot = new Robot();
     }
 
-    public void executeRobot(String dmo) {
+    public boolean execute(String dmo) {
+        try {
+            robot.delay(sbConfig.getRobotStartDelay());
+            robot.setAutoDelay(10);
+            robot.setAutoWaitForIdle(true);
 
-        robot.delay(5000);
-        robot.setAutoDelay(10);
-        robot.setAutoWaitForIdle(true);
+            String initial = "t/demo dmo/";
 
-        String initial = "t/demo dmo/";
+            type(initial);
+            type(dmo);
+            type(KeyEvent.VK_ENTER);
+            System.out.println("-- Initialize " + dmo + ".dmo");
 
-        type(initial);
-        type(dmo);
-        type(KeyEvent.VK_ENTER);
-        System.out.println("-- Initialize " + dmo + ".dmo");
+            robot.delay(sbConfig.getRobotGamespeedDelay());
+            type("t/gamespeed 1000");
+            type(KeyEvent.VK_ENTER);
 
-        robot.delay(10000);
-        type("t/gamespeed 1000");
-        type(KeyEvent.VK_ENTER);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
 
+        return true;
     }
 
     private void type(int i) {
@@ -64,5 +74,19 @@ public class DmoRobot {
                 robot.keyRelease(code);
             }
         }
+    }
+
+    public static class Maker {
+
+        public DmoRobot make(SbConfig sbConfig) {
+            try {
+                return new DmoRobot(sbConfig);
+            } catch (AWTException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
     }
 }

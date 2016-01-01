@@ -1,11 +1,11 @@
 -- Table: import."position"
 
--- DROP TABLE import."position";
+DROP TABLE import."position";
 
 CREATE TABLE import."position"
 (
   pos_id uuid NOT NULL,
-  pos_player_id bigint,
+  pos_player_id uuid,
   pos_ingame_id bigint,
   pos_coord geometry(PointZ),
   pos_yaw double precision,

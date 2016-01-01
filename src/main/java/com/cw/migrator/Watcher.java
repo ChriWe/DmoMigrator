@@ -1,15 +1,11 @@
 package com.cw.migrator;
 
-import com.cw.database.JDBCConfig;
-import com.cw.database.PostGISJDBC;
-import com.cw.threads.ThreadFactory;
-import com.cw.utils.OSConfig;
-import com.cw.utils.Utils;
+import com.cw.threads.ThreadSignal;
+import com.cw.utils.SbConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -18,26 +14,17 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 public class Watcher {
 
-    private OSConfig osConfig;
-    private ArrayList<String> dmoList;
-    private Thread dmoThread;
-    private ThreadFactory threadFactory;
+    private final SbConfig sbConfig;
     private WatchService watcher;
     private WatchKey key;
 
-    public Watcher(OSConfig osConfig) throws IOException {
-        this.osConfig = osConfig;
-        this.dmoList = Utils.getDmoFiles();
-        this.threadFactory = new ThreadFactory();
+    public Watcher(SbConfig sbConfig) throws IOException {
+        this.sbConfig = sbConfig;
         this.watcher = FileSystems.getDefault().newWatchService();
-        this.key = osConfig.getTrjDir().toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-
-        this.dmoThread = threadFactory.initDmoThread(this.dmoList.get(0));
+        this.key = new File(sbConfig.getTrjHomePath()).toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     }
 
-    public void watch() {
-        int dmoCount = 0;
-
+    public void watch(ThreadSignal threadSignal) {
         while (true) {
             WatchKey key;
             try {
@@ -59,30 +46,14 @@ public class Watcher {
                     continue;
                 } else if (kind == ENTRY_CREATE) {
 
+                    if (fileName.toString().equals(sbConfig.getRecordEndFileName())) {
+                        threadSignal.setDmoDone(true);
+                    }
+
                 } else if (kind == ENTRY_DELETE) {
 
                 } else if (kind == ENTRY_MODIFY) {
 
-                    if (fileName.toString().equals(osConfig.getTrjDefaultName())) {
-
-                        if (dmoCount < dmoList.size()) {
-                            String dmoName = dmoList.get(dmoCount);
-                            String csvName = dmoName + ".csv";
-                            Utils.renameTrj(fileName.toString(), csvName);
-                            System.out.println("-- " + (dmoCount + 1) + ". Creation: " + csvName);
-
-                            if (dmoCount < dmoList.size() - 1) {
-                                String nextDmo = dmoList.get(dmoCount + 1);
-                                this.dmoThread = threadFactory.initDmoThread(nextDmo);
-                            }
-
-                            dmoCount++;
-                        }
-
-                        if (dmoCount == dmoList.size()) {
-                           initPostGISMigration();
-                        }
-                    }
                 }
             }
 
@@ -94,25 +65,4 @@ public class Watcher {
         }
     }
 
-    private void initPostGISMigration() {
-        System.out.println("-- Done converting all dmo´s to csv´s.");
-        System.out.println("-- Starting PostGIS migration.");
-
-        JDBCConfig jdbcConfig = new JDBCConfig();
-        PostGISJDBC postGISJDBC = new PostGISJDBC(jdbcConfig);
-        postGISJDBC.init();
-
-        File[] trjHome = new File(osConfig.getTrjHomePath()).listFiles();
-        for (File trjFile: trjHome) {
-            TrjParser trjParser = new TrjParser(trjFile);
-            trjParser.writeTrjToPostGIS(jdbcConfig, postGISJDBC);
-            System.out.println("-- Done migrating csv " + trjFile.getName());
-        }
-
-        postGISJDBC.close();
-
-        System.out.println("-- Done migrating all csv´s.");
-        System.out.println("-- Exiting DMO - Migrator.");
-        System.exit(0);
-    }
 }
