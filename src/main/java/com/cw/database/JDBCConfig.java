@@ -33,7 +33,7 @@ public class JDBCConfig {
 
         try {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            input = classloader.getResourceAsStream("jdbc.properties");
+            input = classloader.getResourceAsStream("proeprties/jdbc.properties");
             prop.load(input);
         } catch (IOException ex) {
             ex.printStackTrace();

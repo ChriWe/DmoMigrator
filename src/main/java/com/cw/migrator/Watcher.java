@@ -1,7 +1,6 @@
 package com.cw.migrator;
 
 import com.cw.threads.ThreadSignal;
-import com.cw.utils.SbConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,14 +13,14 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 public class Watcher {
 
-    private final SbConfig sbConfig;
+    private final MigratorConfig migratorConfig;
     private WatchService watcher;
     private WatchKey key;
 
-    public Watcher(SbConfig sbConfig) throws IOException {
-        this.sbConfig = sbConfig;
+    public Watcher(MigratorConfig migratorConfig) throws IOException {
+        this.migratorConfig = migratorConfig;
         this.watcher = FileSystems.getDefault().newWatchService();
-        this.key = new File(sbConfig.getTrjHomePath()).toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+        this.key = new File(migratorConfig.getTrjHomePath()).toPath().register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     }
 
     public void watch(ThreadSignal threadSignal) {
@@ -46,7 +45,7 @@ public class Watcher {
                     continue;
                 } else if (kind == ENTRY_CREATE) {
 
-                    if (fileName.toString().equals(sbConfig.getRecordEndFileName())) {
+                    if (fileName.toString().equals(migratorConfig.getRecordEndFileName())) {
                         threadSignal.setDmoDone(true);
                     }
 

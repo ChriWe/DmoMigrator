@@ -1,7 +1,5 @@
 package com.cw.migrator;
 
-import com.cw.utils.SbConfig;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -10,17 +8,17 @@ import java.awt.event.KeyEvent;
  */
 public class DmoRobot {
 
-    private final SbConfig sbConfig;
+    private final MigratorConfig migratorConfig;
     private final Robot robot;
 
-    private DmoRobot(SbConfig sbConfig) throws AWTException {
-        this.sbConfig = sbConfig;
+    private DmoRobot(MigratorConfig migratorConfig) throws AWTException {
+        this.migratorConfig = migratorConfig;
         this.robot = new Robot();
     }
 
     public boolean execute(String dmo) {
         try {
-            robot.delay(sbConfig.getRobotStartDelay());
+            robot.delay(migratorConfig.getRobotStartDelay());
             robot.setAutoDelay(10);
             robot.setAutoWaitForIdle(true);
 
@@ -31,7 +29,7 @@ public class DmoRobot {
             type(KeyEvent.VK_ENTER);
             System.out.println("-- Initialize " + dmo + ".dmo");
 
-            robot.delay(sbConfig.getRobotGamespeedDelay());
+            robot.delay(migratorConfig.getRobotGamespeedDelay());
             type("t/gamespeed 1000");
             type(KeyEvent.VK_ENTER);
 
@@ -78,9 +76,9 @@ public class DmoRobot {
 
     public static class Maker {
 
-        public DmoRobot make(SbConfig sbConfig) {
+        public DmoRobot make(MigratorConfig migratorConfig) {
             try {
-                return new DmoRobot(sbConfig);
+                return new DmoRobot(migratorConfig);
             } catch (AWTException e) {
                 e.printStackTrace();
             }

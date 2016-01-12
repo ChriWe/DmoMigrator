@@ -1,5 +1,6 @@
 package com.cw.utils;
 
+import com.cw.migrator.MigratorConfig;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -10,14 +11,14 @@ import java.util.ArrayList;
  */
 public class Utils {
 
-    private static final SbConfig sbConfig;
+    private static final MigratorConfig MIGRATOR_CONFIG;
 
     static {
-        sbConfig = new SbConfig();
+        MIGRATOR_CONFIG = new MigratorConfig();
     }
 
     public static ArrayList<String> getDmoFiles() {
-        File[] dmoFiles = new File(sbConfig.getDmoDirPath()).listFiles();
+        File[] dmoFiles = new File(MIGRATOR_CONFIG.getDmoDirPath()).listFiles();
         ArrayList<String> dmoList = new ArrayList<>();
         for (File dmo : dmoFiles) {
             if (FilenameUtils.isExtension(dmo.getName(), "dmo")) {
@@ -32,14 +33,14 @@ public class Utils {
     }
 
     private static boolean trjHomeCleaned() {
-        File[] trjFiles = new File(sbConfig.getTrjHomePath()).listFiles();
+        File[] trjFiles = new File(MIGRATOR_CONFIG.getTrjHomePath()).listFiles();
         boolean removed = true;
         for (File trjFile : trjFiles) {
-            if (trjFile.getName().equals(sbConfig.getTrjDefaultName())) {
-                System.out.println("-- Remove " + sbConfig.getTrjDefaultName());
+            if (trjFile.getName().equals(MIGRATOR_CONFIG.getTrjDefaultName())) {
+                System.out.println("-- Remove " + MIGRATOR_CONFIG.getTrjDefaultName());
                 removed = trjFile.delete();
-            } else if (trjFile.getName().equals(sbConfig.getRecordEndFileName())) {
-                System.out.println("-- Remove " + sbConfig.getRecordEndFileName());
+            } else if (trjFile.getName().equals(MIGRATOR_CONFIG.getRecordEndFileName())) {
+                System.out.println("-- Remove " + MIGRATOR_CONFIG.getRecordEndFileName());
                 removed = trjFile.delete();
             }
         }
@@ -47,8 +48,8 @@ public class Utils {
     }
 
     public static boolean renameTrj(String fileName, String newName) {
-        File trjFile = new File(sbConfig.getTrjHomePath() + "/" + fileName);
-        File newFile = new File(sbConfig.getTrjHomePath() + "/" + newName);
+        File trjFile = new File(MIGRATOR_CONFIG.getTrjHomePath() + "/" + fileName);
+        File newFile = new File(MIGRATOR_CONFIG.getTrjHomePath() + "/" + newName);
 
         if (newFile.exists()) {
             System.out.println("-- Overriding file " + newName);

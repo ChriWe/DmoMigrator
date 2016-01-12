@@ -1,6 +1,6 @@
 package com.cw.threads;
 
-import com.cw.utils.SbConfig;
+import com.cw.migrator.MigratorConfig;
 
 /**
  * Created by Christoph on 28.12.2015.
@@ -9,20 +9,19 @@ public class ThreadManager {
 
     private final MigratorThreadFactory migratorThreadFactory;
 
-    private ThreadManager(SbConfig sbConfig) {
-        this.migratorThreadFactory = new MigratorThreadFactory.Maker().make(sbConfig, new ThreadSignal());
+    private ThreadManager(MigratorConfig migratorConfig) {
+        this.migratorThreadFactory = new MigratorThreadFactory.Maker().make(migratorConfig, ThreadSignal.getInstance());
     }
 
     public void start() {
-        this.migratorThreadFactory.newThread(MigratorThreads.SB).start();
-        this.migratorThreadFactory.newThread(MigratorThreads.WATCH).start();
         this.migratorThreadFactory.newThread(MigratorThreads.DMO).start();
+        this.migratorThreadFactory.newThread(MigratorThreads.WATCH).start();
     }
 
     public static class Maker {
 
-        public ThreadManager make(SbConfig sbConfig) {
-            return new ThreadManager(sbConfig);
+        public ThreadManager make(MigratorConfig migratorConfig) {
+            return new ThreadManager(migratorConfig);
         }
 
     }

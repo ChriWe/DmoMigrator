@@ -5,10 +5,9 @@ import com.cw.database.PostGISJDBC;
 import com.cw.migrator.DmoRobot;
 import com.cw.migrator.TrjParser;
 import com.cw.migrator.Watcher;
-import com.cw.utils.SbConfig;
+import com.cw.migrator.MigratorConfig;
 import com.cw.utils.Utils;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,11 +18,11 @@ import java.util.Arrays;
  */
 public class MigratorThreadFactory {
 
-    private final SbConfig sbConfig;
+    private final MigratorConfig migratorConfig;
     private ThreadSignal threadSignal;
 
-    private MigratorThreadFactory(SbConfig sbConfig, ThreadSignal threadSignal) {
-        this.sbConfig = sbConfig;
+    private MigratorThreadFactory(MigratorConfig migratorConfig, ThreadSignal threadSignal) {
+        this.migratorConfig = migratorConfig;
         this.threadSignal = threadSignal;
     }
 
@@ -31,8 +30,6 @@ public class MigratorThreadFactory {
         switch (migratorThread) {
             case WATCH:
                 return watchThread();
-            case SB:
-                return sbThread();
             case DMO:
                 return dmoThread();
         }
@@ -45,7 +42,7 @@ public class MigratorThreadFactory {
             @Override
             public void run() {
                 try {
-                    Watcher watcher = new Watcher(sbConfig);
+                    Watcher watcher = new Watcher(migratorConfig);
                     watcher.watch(threadSignal);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -62,11 +59,13 @@ public class MigratorThreadFactory {
         Thread dmoThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                runSb();
+
                 ArrayList<String> dmoList = Utils.getDmoFiles();
                 int dmoCount = 0;
                 for (String dmoName : dmoList) {
 
-                    boolean execution = new DmoRobot.Maker().make(sbConfig).execute(dmoName);
+                    boolean execution = new DmoRobot.Maker().make(migratorConfig).execute(dmoName);
                     if (execution) {
                         threadSignal.setDmoName(dmoName);
                         threadSignal.setDmoDone(false);
@@ -75,17 +74,17 @@ public class MigratorThreadFactory {
 
                     String csvName = dmoName + ".csv";
 
-                    boolean renamed = Utils.renameTrj(sbConfig.getTrjDefaultName(), csvName);
+                    boolean renamed = Utils.renameTrj(migratorConfig.getTrjDefaultName(), csvName);
                     if (!renamed) {
-                        System.out.println("-- Renaming for " + sbConfig.getTrjDefaultName() + " to "
+                        System.out.println("-- Renaming for " + migratorConfig.getTrjDefaultName() + " to "
                                 + csvName + " failed.");
                     } else {
                         System.out.println("-- " + dmoCount + ". Creation: " + csvName + " done.");
                     }
 
-                    boolean deleted = new File(sbConfig.getRecordEndFilePath()).delete();
+                    boolean deleted = new File(migratorConfig.getRecordEndFilePath()).delete();
                     if (!deleted) {
-                        System.out.println("-- Deletion for " + sbConfig.getRecordEndFileName() + " failed.");
+                        System.out.println("-- Deletion for " + migratorConfig.getRecordEndFileName() + " failed.");
                     }
 
                 }
@@ -102,25 +101,11 @@ public class MigratorThreadFactory {
         return dmoThread;
     }
 
-    private Thread sbThread() {
-
-        Thread sbThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                runSb();
-            }
-        });
-
-        sbThread.setName(MigratorThreads.SB.toString());
-
-        return sbThread;
-    }
-
     private Process runSb() {
         ArrayList<String> exec = new ArrayList<>();
-        exec.add(sbConfig.getSbExecDir());
-        exec.addAll(Arrays.asList(sbConfig.getSbStartParams().split(" ")));
-        File executionDir = new File(sbConfig.getSbDirPath());
+        exec.add(migratorConfig.getSbExecDir());
+        exec.addAll(Arrays.asList(migratorConfig.getSbStartParams().split(" ")));
+        File executionDir = new File(migratorConfig.getSbDirPath());
 
         ProcessBuilder pb = new ProcessBuilder(exec);
         pb.directory(executionDir);
@@ -144,7 +129,7 @@ public class MigratorThreadFactory {
         PostGISJDBC postGISJDBC = new PostGISJDBC(jdbcConfig);
         postGISJDBC.init();
 
-        File[] trjHome = new File(sbConfig.getTrjHomePath()).listFiles();
+        File[] trjHome = new File(migratorConfig.getTrjHomePath()).listFiles();
         int migrationCount = 0;
         for (File trjFile : trjHome) {
             TrjParser trjParser = new TrjParser(trjFile);
@@ -159,8 +144,8 @@ public class MigratorThreadFactory {
 
     public static class Maker {
 
-        public MigratorThreadFactory make(SbConfig sbConfig, ThreadSignal threadSignal) {
-            return new MigratorThreadFactory(sbConfig, threadSignal);
+        public MigratorThreadFactory make(MigratorConfig migratorConfig, ThreadSignal threadSignal) {
+            return new MigratorThreadFactory(migratorConfig, threadSignal);
         }
 
     }

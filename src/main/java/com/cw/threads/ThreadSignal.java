@@ -8,6 +8,18 @@ public class ThreadSignal {
     private boolean dmoDone = false;
     private String dmoName;
 
+    // Singleton Implementation
+    private ThreadSignal() {}
+
+    private static class SingletonHelper {
+        private static final ThreadSignal INSTANCE = new ThreadSignal();
+    }
+
+    public static ThreadSignal getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+
+
     public boolean isDmoDone(){
         return this.dmoDone;
     }

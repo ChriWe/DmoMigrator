@@ -1,4 +1,4 @@
-package com.cw.utils;
+package com.cw.migrator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,7 @@ import java.util.Properties;
 /**
  * Created by Christoph on 02.12.2015.
  */
-public class SbConfig {
+public class MigratorConfig {
 
     private static final String TRJ_DEFAULT_NAME = "trajectorie.csv";
     private static final String RECORD_END_FILE = "record_end_file.csv";
@@ -20,7 +20,7 @@ public class SbConfig {
     private final int ROBOT_START_DELAY;
     private final int ROBOT_GAMESPEED_DELAY;
 
-    public SbConfig() {
+    public MigratorConfig() {
         Properties config = getConfig();
         this.SB_HOME = config.getProperty("SB_HOME");
         this.TRJ_HOME = config.getProperty("TRJ_HOME");
@@ -37,7 +37,7 @@ public class SbConfig {
 
         try {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            input = classloader.getResourceAsStream("sb.properties");
+            input = classloader.getResourceAsStream("properties/sb.properties");
             prop.load(input);
         } catch (IOException ex) {
             ex.printStackTrace();
